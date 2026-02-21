@@ -69,6 +69,12 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    streams: Stream;
+    creators: Creator;
+    pages: Page;
+    creators1: Creators1;
+    'Stream-Analytics': StreamAnalytic;
+    streamanalytics1: Streamanalytics1;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +84,12 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    streams: StreamsSelect<false> | StreamsSelect<true>;
+    creators: CreatorsSelect<false> | CreatorsSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    creators1: Creators1Select<false> | Creators1Select<true>;
+    'Stream-Analytics': StreamAnalyticsSelect<false> | StreamAnalyticsSelect<true>;
+    streamanalytics1: Streamanalytics1Select<false> | Streamanalytics1Select<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -122,6 +134,7 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
+  role: 'admin' | 'editor' | 'viewer';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -158,6 +171,257 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    banner?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "streams".
+ */
+export interface Stream {
+  id: string;
+  title: string;
+  streamUrl: string;
+  platform: 'youtube' | 'twitch' | 'kick' | 'rumble' | 'other';
+  creator: string | Creator;
+  /**
+   * Auto-updated based on platform API
+   */
+  isLive?: boolean | null;
+  /**
+   * Current viewer count
+   */
+  viewerCount?: number | null;
+  /**
+   * When the stream started
+   */
+  startedAt?: string | null;
+  thumbnail?: (string | null) | Media;
+  featuredImage?: (string | null) | Media;
+  /**
+   * When the stream ended
+   */
+  endedAt?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "creators".
+ */
+export interface Creator {
+  id: string;
+  /**
+   * Auto-filled from channel URL
+   */
+  channelName?: string | null;
+  platform: 'youtube' | 'twitch' | 'kick' | 'rumble' | 'other';
+  channelUrl: string;
+  /**
+   * Auto-extracted YouTube channel ID
+   */
+  channelId?: string | null;
+  channelLogo?: (string | null) | Media;
+  /**
+   * Auto-filled from platform
+   */
+  description?: string | null;
+  fetchedLogoUrl?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  title: string;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "creators1".
+ */
+export interface Creators1 {
+  id: string;
+  /**
+   * Auto-filled from YouTube
+   */
+  channelName?: string | null;
+  /**
+   * Select the streaming platform
+   */
+  platform: 'youtube' | 'twitch' | 'kick' | 'rumble' | 'other';
+  /**
+   * Paste a YouTube channel URL or video URL
+   */
+  channelUrl?: string | null;
+  /**
+   * Auto-extracted channel ID
+   */
+  channelId?: string | null;
+  /**
+   * Auto-uploaded from YouTube
+   */
+  channelLogo?: (string | null) | Media;
+  /**
+   * Auto-filled from YouTube
+   */
+  description?: string | null;
+  fetchedLogoUrl?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Stream-Analytics".
+ */
+export interface StreamAnalytic {
+  id: string;
+  stream: string | Stream;
+  creator: string | Creators1;
+  /**
+   * Denormalized for faster filtering
+   */
+  platform: 'youtube' | 'twitch' | 'kick' | 'rumble';
+  /**
+   * Viewer count at different times during stream
+   */
+  viewerSnapshots?:
+    | {
+        timestamp: string;
+        viewerCount: number;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Highest viewer count during stream
+   */
+  peakViewer?: number | null;
+  /**
+   * Average viewer count during stream
+   */
+  averageViewers?: number | null;
+  startedAt: string;
+  /**
+   * When the stream ended (null if still live)
+   */
+  endedAt?: string | null;
+  /**
+   * Stream duration in minutes
+   */
+  duration?: number | null;
+  /**
+   * Number of viewer snapshots taken
+   */
+  totalSnapshots?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "streamanalytics1".
+ */
+export interface Streamanalytics1 {
+  id: string;
+  stream: string | Stream;
+  creator?: (string | null) | Creators1;
+  /**
+   * Stream title (stored for quick access)
+   */
+  streamTitle: string;
+  /**
+   * Stream URL (stored for quick access)
+   */
+  streamUrl?: string | null;
+  /**
+   * Thumbnail URL (stored for quick access)
+   */
+  thumbnailUrl?: string | null;
+  /**
+   * Creator channel name (stored for quick access)
+   */
+  creatorName: string;
+  /**
+   * Denmormalize for faster searching
+   */
+  platform: 'youtube' | 'twitch' | 'kick' | 'rumble' | 'others';
+  /**
+   * Highest viewerCount from snapshots
+   */
+  peakViewer?: number | null;
+  /**
+   * Average viewer count from influxdb
+   */
+  averageViewers?: number | null;
+  startedAt: string;
+  /**
+   * When the stream ended (null if still live)
+   */
+  endedAt?: string | null;
+  /**
+   * Stream duration in minutes
+   */
+  duration?: number | null;
+  /**
+   * Last time analytics were calculated
+   */
+  lastUpdated?: string | null;
+  /**
+   * Is stream currently live
+   */
+  isLive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -190,6 +454,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'streams';
+        value: string | Stream;
+      } | null)
+    | ({
+        relationTo: 'creators';
+        value: string | Creator;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: string | Page;
+      } | null)
+    | ({
+        relationTo: 'creators1';
+        value: string | Creators1;
+      } | null)
+    | ({
+        relationTo: 'Stream-Analytics';
+        value: string | StreamAnalytic;
+      } | null)
+    | ({
+        relationTo: 'streamanalytics1';
+        value: string | Streamanalytics1;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -238,6 +526,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -272,6 +561,136 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        banner?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "streams_select".
+ */
+export interface StreamsSelect<T extends boolean = true> {
+  title?: T;
+  streamUrl?: T;
+  platform?: T;
+  creator?: T;
+  isLive?: T;
+  viewerCount?: T;
+  startedAt?: T;
+  thumbnail?: T;
+  featuredImage?: T;
+  endedAt?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "creators_select".
+ */
+export interface CreatorsSelect<T extends boolean = true> {
+  channelName?: T;
+  platform?: T;
+  channelUrl?: T;
+  channelId?: T;
+  channelLogo?: T;
+  description?: T;
+  fetchedLogoUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "creators1_select".
+ */
+export interface Creators1Select<T extends boolean = true> {
+  channelName?: T;
+  platform?: T;
+  channelUrl?: T;
+  channelId?: T;
+  channelLogo?: T;
+  description?: T;
+  fetchedLogoUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Stream-Analytics_select".
+ */
+export interface StreamAnalyticsSelect<T extends boolean = true> {
+  stream?: T;
+  creator?: T;
+  platform?: T;
+  viewerSnapshots?:
+    | T
+    | {
+        timestamp?: T;
+        viewerCount?: T;
+        id?: T;
+      };
+  peakViewer?: T;
+  averageViewers?: T;
+  startedAt?: T;
+  endedAt?: T;
+  duration?: T;
+  totalSnapshots?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "streamanalytics1_select".
+ */
+export interface Streamanalytics1Select<T extends boolean = true> {
+  stream?: T;
+  creator?: T;
+  streamTitle?: T;
+  streamUrl?: T;
+  thumbnailUrl?: T;
+  creatorName?: T;
+  platform?: T;
+  peakViewer?: T;
+  averageViewers?: T;
+  startedAt?: T;
+  endedAt?: T;
+  duration?: T;
+  lastUpdated?: T;
+  isLive?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

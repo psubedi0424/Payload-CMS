@@ -1,0 +1,44 @@
+import { CollectionConfig } from "payload";
+
+export const Pages: CollectionConfig = {
+    slug: 'pages',
+    admin: {
+        group: 'Content',
+        useAsTitle: 'title',
+    },
+    access: {
+        read: ({req:{user}}) => {
+            if (user) {
+                return true;
+            }
+            return {
+                _status: { equals: 'published' }
+            }
+        }
+    },
+    versions: {
+        drafts: {
+            autosave: true,
+        },
+    },
+    hooks: {
+        beforeChange: [
+            ({ data }) => {
+                if (data._status === 'draft') {
+                    // draft logic
+                }
+            },
+        ]
+    },
+    fields: [
+        {
+            name: 'title',
+            type: 'text',
+            required: true,
+        },
+        {
+            name: 'content',
+            type: 'richText',
+        },
+    ],
+}

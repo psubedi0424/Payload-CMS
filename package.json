@@ -18,23 +18,30 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
+    "@genway-ai/youtube-link-utils": "^1.2.0",
+    "@influxdata/influxdb-client": "^1.35.0",
+    "@payloadcms/db-mongodb": "3.69.0",
     "@payloadcms/next": "3.69.0",
     "@payloadcms/richtext-lexical": "3.69.0",
     "@payloadcms/ui": "3.69.0",
+    "bullmq": "^5.66.4",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
+    "get-youtube-id": "^1.0.1",
     "graphql": "^16.8.1",
+    "ioredis": "^5.9.1",
     "next": "15.4.10",
+    "node-cron": "^4.2.1",
     "payload": "3.69.0",
     "react": "19.2.1",
     "react-dom": "19.2.1",
-    "sharp": "0.34.2",
-    "@payloadcms/db-mongodb": "3.69.0"
+    "sharp": "0.34.2"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",
     "@testing-library/react": "16.3.0",
     "@types/node": "^22.5.4",
+    "@types/node-cron": "^3.0.11",
     "@types/react": "19.2.1",
     "@types/react-dom": "19.2.1",
     "@vitejs/plugin-react": "4.5.2",
@@ -58,5 +65,6 @@
       "esbuild",
       "unrs-resolver"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a"
 }
